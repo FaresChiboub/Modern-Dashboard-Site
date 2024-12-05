@@ -1,0 +1,17 @@
+/* Error: There is no module with the namespace "color".
+ *   ,
+ * 2 | $colorRight: color.scale($color, $lightness: -7.5443786982%);
+ *   |              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ *   '
+ *   src\styles\main.scss 2:14  root stylesheet */
+
+body::before {
+  font-family: "Source Code Pro", "SF Mono", Monaco, Inconsolata, "Fira Mono",
+      "Droid Sans Mono", monospace, monospace;
+  white-space: pre;
+  display: block;
+  padding: 1em;
+  margin-bottom: 1em;
+  border-bottom: 2px solid black;
+  content: 'Error: There is no module with the namespace "color".\a   \2577 \a 2 \2502  $colorRight: color.scale($color, $lightness: -7.5443786982%);\d\a   \2502               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\a   \2575 \a   src\\styles\\main.scss 2:14  root stylesheet';
+}

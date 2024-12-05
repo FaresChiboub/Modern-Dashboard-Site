@@ -1,0 +1,169 @@
+import { NextRequest, NextResponse } from "next/server";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import prisma from "@/lib/prisma";
+import { cookies } from "next/headers";
+import { SendEmail } from "@/lib/mail";
+import fs from "fs";
+import path from "path";
+import { randomInt } from "crypto";
+import Handlebars from "handlebars";
+
+export async function POST(req: NextRequest) {
+  const secretKey = process.env.JWT_SECRET || "";
+  const refreshKey = process.env.JWT_REFRESH_SECRET || "";
+  if (!secretKey || !refreshKey) {
+    throw new Error(
+      "JWT_SECRET or JWT_REFRESH_SECRET is not defined in environment variables."
+    );
+  }
+  try {
+    const { username, email, password, role } = await req.json();
+    // Validate fields
+    if (!username || !email || !password) {
+      return new NextResponse(
+        JSON.stringify({ error: { message: "All fields are required!" } }),
+        {
+          status: 400,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return new NextResponse(
+        JSON.stringify({ error: { message: "User already exists!" } }),
+        {
+          status: 409,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+    const existingName = await prisma.user.findUnique({ where: { username } });
+    if (existingName) {
+      return new NextResponse(
+        JSON.stringify({ error: { message: "Username already exists!" } }),
+        {
+          status: 409,
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+    }
+    // Hash the password and create the user
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    const verificationCode = randomInt(100000, 1000000);
+    const newUser = await prisma.user.create({
+      data: {
+        username,
+        password: hash,
+        email,
+        role,
+        isVerified: false,
+        verificationCode: verificationCode.toString(),
+      },
+    });
+   
+
+    // Create JWT tokens
+    const accessToken = jwt.sign(
+      {
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          username: newUser.username,
+          isVerified: newUser.isVerified,
+        },
+      },
+      secretKey,
+      { expiresIn: "1h" }
+    );
+    const refreshToken = jwt.sign(
+      {
+        user: {
+          id: newUser.id,
+          email: newUser.email,
+          username: newUser.username,
+          isVerified: newUser.isVerified,
+        },
+      },
+      refreshKey,
+      { expiresIn: "7d" }
+    );
+    // Store tokens in cookies
+    const cookieStore = await cookies();
+    cookieStore.set("token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 1 * 60 * 60, // 1 hour for access token
+    });
+    cookieStore.set("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: 7 * 24 * 60 * 60, // 7 days for refresh token
+    });
+    // Send email with verification code
+    const filePath = path.join(
+      process.cwd(),
+      "public",
+      "component",
+      "email",
+      "index.html"
+    );
+    const htmlTemplate = fs.readFileSync(filePath, "utf-8");
+    const template = Handlebars.compile(htmlTemplate);
+    const htmlContent = template({
+      username,
+      verificationCode: verificationCode.toString(),
+    });
+    const smtpEmail = `AC CORP ${process.env.SMTP_EMAIL}`;
+    if (!smtpEmail) {
+      return (
+        new NextResponse(
+          JSON.stringify({
+            error: {
+              message: "SMTP EMAIL IS MISSING IN ENVIRONMENT VARIABLES",
+            },
+          })
+        ),
+        {
+          status: 404,
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+    }
+    await SendEmail({
+      to: email,
+      from: smtpEmail,
+      subject: "Welcome to Our Service",
+      text: `Your verification code is: ${verificationCode}`,
+      html: htmlContent,
+    });
+    return new NextResponse(
+      JSON.stringify({
+        message: "Account successfully created! Please verify your email.",
+        user: { username, email },
+      }),
+      {
+        status: 201,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (error) {
+    console.error("Registration Error:", error);
+    return new NextResponse(
+      JSON.stringify({ error: { message: "Internal error" } }),
+      {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  }
+}
