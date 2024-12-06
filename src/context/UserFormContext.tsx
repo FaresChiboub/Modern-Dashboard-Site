@@ -200,10 +200,16 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         } else {
           // If response is not empty but still not OK, parse the error message
           const data = await response.text();
+          let message = "Unknown error occurred.";
+          const parsedData = JSON.parse(data);
+          if (parsedData) {
+            message = parsedData.error.message;
+          }
           toast({
             variant: "destructive",
             title: "Uh oh! Something went wrong.",
-            description: data || "Unknown error occurred.",
+            description: message,
+            action: <ToastAction altText="Try again">Try again</ToastAction>,
           });
         }
         return;

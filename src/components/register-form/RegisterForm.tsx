@@ -1,10 +1,39 @@
 "use client";
-import React, { useContext } from "react";
+import React, {
+  useContext,
+  useDeferredValue,
+  useEffect,
+  useState,
+} from "react";
 import Image from "next/image";
 import { SocialIcon } from "react-social-icons";
-import { Eye, EyeOff, ThumbsUp } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { UserFormContext } from "@/context/UserFormContext";
 import { signIn } from "next-auth/react";
+import { zxcvbnAsync } from "@zxcvbn-ts/core";
+import PasswordMeter from "../password-meter/PasswordMeter";
+
+interface ZxcvbnResult {
+  score: number;
+  feedback: {
+    suggestions: string[];
+    warnings: string[];
+  };
+}
+
+// Custom hook for password strength
+const usePasswordStrength = (password: string) => {
+  const [result, setResult] = useState<ZxcvbnResult | null>(null);
+  const deferredPassword = useDeferredValue(password);
+
+  useEffect(() => {
+    if (deferredPassword) {
+      zxcvbnAsync(deferredPassword).then((response) => setResult(response));
+    }
+  }, [deferredPassword]);
+
+  return result;
+};
 
 const RegisterForm = () => {
   const context = useContext(UserFormContext);
@@ -20,17 +49,23 @@ const RegisterForm = () => {
     showPassword,
     redirectToLogin,
   } = context;
+
+  // Call the hook to get the password strength
+  const result = usePasswordStrength(inputData.password);
+  const score = result?.score ?? 0;
+  const passwordStrengthScore = inputData.password ? score : null;
+
   return (
-    <div className=" w-full h-screen flex flex-col smScreen:flex-row items-center overflow-hidden bg-slate-100 text-white">
+    <div className="w-full h-screen flex flex-col smScreen:flex-row items-center overflow-hidden bg-slate-100 text-white">
       {/* Left side */}
-      <div className="  flex flex-col bg-cover bg-center justify-center items-center gap-5 w-full md:w-[35%] sm:w-full h-screen colorWave animate-gradient">
+      <div className="flex flex-col bg-cover bg-center justify-center items-center gap-5 w-full md:w-[35%] sm:w-full h-screen colorWave animate-gradient">
         <h1 className="text-4xl font-bold py-3">One Of Us?</h1>
         <h3 className="leading-[2rem] px-2 text-center text-xl">
           If you already have an account, just sign in. We&apos;ve missed you!
         </h3>
         <button
           onClick={redirectToLogin}
-          className=" rounded-md bg-white  text-black py-2 px-5 w-1/2 hover:bg-purple-500 hover:text-white"
+          className="rounded-md bg-white text-black py-2 px-5 w-1/2 hover:bg-purple-500 hover:text-white"
         >
           Sign In
         </button>
@@ -39,8 +74,7 @@ const RegisterForm = () => {
       {/* Right side */}
       <div className="md:w-[65%] px-5 h-screen">
         <div className="flex items-center gap-1 py-5">
-          <Image src="/logo.png" alt="AF Logo" width={30} height={30} />
-          <h1 className="text-xl text-slate-500 font-bold">AF</h1>
+          <Image src="/logo.png" alt="AF Logo" width={60} height={60} />
         </div>
         <div className="flex flex-col gap-3 mt-32 text-center">
           <h1 className="w-full text-5xl md:w-[90%] mx-auto text-slate-900 font-bold py-3 leading-[4rem]">
@@ -65,7 +99,7 @@ const RegisterForm = () => {
           {/* OR Divider */}
           <div className="flex justify-center items-center mt-4">
             <hr className="border-t-1 border-slate-400 mx-2 w-[20%]" />
-            <span className=" text-slate-400 font-bold"> OR</span>
+            <span className="text-slate-400 font-bold"> OR</span>
             <hr className="border-t-1 border-slate-400 mx-2 w-[20%]" />
           </div>
 
@@ -78,7 +112,7 @@ const RegisterForm = () => {
                 id="username"
                 type="text"
                 placeholder="Name"
-                className="rounded-xl py-2 px-5 w-full text-black bg-white"
+                className="z-50 rounded-xl py-2 px-5 w-full text-black bg-white"
               />
               <input
                 value={inputData.email}
@@ -86,21 +120,23 @@ const RegisterForm = () => {
                 id="email"
                 type="email"
                 placeholder="Email"
-                className=" rounded-xl py-2 px-5 w-full text-black bg-white"
+                className="z-50 rounded-xl py-2 px-5 w-full text-black bg-white"
               />
-              <div className="relative">
+              <div className="relative flex flex-col items-center">
+                {/* Password */}
                 <input
                   value={inputData.password}
                   onChange={handleChange}
                   id="password"
                   type={showPassword.password ? "text" : "password"}
                   placeholder="Password"
-                  className={` rounded-xl py-2 px-5 w-full text-black bg-white `}
+                  className="z-50 rounded-xl py-2 px-5 w-full text-black bg-white"
                 />
 
+                {/* Toggle Password Visibility */}
                 <div
                   onClick={() => handleShowPassword("password")}
-                  className="absolute right-3 top-[26%] cursor-pointer text-slate-400"
+                  className=" z-50 absolute right-3 top-[26%] cursor-pointer text-slate-400"
                 >
                   {showPassword.password ? (
                     <Eye className="h-5" />
@@ -109,38 +145,44 @@ const RegisterForm = () => {
                   )}
                 </div>
               </div>
-              <div className="relative">
+              {/* Password Meter */}
+              {inputData.password && (
+                <div className="z-50">
+                  <PasswordMeter score={passwordStrengthScore} />
+                </div>
+              )}
+              <div className="relative flex items-center">
+                {/* Confirm Password */}
                 <input
                   value={inputData.confirmPassword}
                   id="confirmPassword"
                   onChange={handleChange}
                   type={showPassword.confirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
-                  className={`flex items-center rounded-xl py-2 px-5 w-full bg-white  ${
+                  className={`z-50 flex items-center rounded-xl py-2 px-5 w-full bg-white ${
                     !isPasswordMatch ? "text-black" : "text-red-500"
                   }`}
                 />
                 <div
-                  className={`absolute top-[27%] text-sm right-[10%] ${
+                  className={`z-50 absolute top-12 right-0 text-sm ${
                     isPasswordMatch ? "text-red-500" : "text-[#4B9CD3]"
                   }`}
                 >
                   {inputData.confirmPassword.length < 4 ? (
                     ""
                   ) : isPasswordMatch ? (
-                    <span className="flex items-center gap-2">
-                      Password do not match ⚠️
+                    <span className="border rounded-md bg-red-700 px-2 text-white flex items-center gap-2 font-bold text-[10px]">
+                      Password don&apos;t match ⚠️
                     </span>
                   ) : (
-                    <span className="flex items-center gap-2 text-sm text-green-700 px-3">
-                      Password match{" "}
-                      <ThumbsUp className="h-5" color="#32CD32" />
+                    <span className="border bg-green-700 rounded-md font-bold flex items-center gap-2 text-[10px] text-white px-3">
+                      Password Match
                     </span>
                   )}
                 </div>
                 <div
                   onClick={() => handleShowPassword("confirmPassword")}
-                  className="absolute right-3 top-[26%] cursor-pointer text-slate-400"
+                  className="z-50 absolute right-3 top-[25%] cursor-pointer text-slate-400"
                 >
                   {showPassword.confirmPassword ? (
                     <Eye className="h-5" />
@@ -155,11 +197,11 @@ const RegisterForm = () => {
             <button
               type="submit"
               disabled={isPasswordMatch}
-              className={` ${
+              className={`${
                 !isPasswordMatch
-                  ? "bg-blue-400  text-white  hover:bg-blue-500"
-                  : "bg-slate-300  text-grey cursor-not-allowed"
-              } py-2 px-5 my-12 mx-auto w-1/3 transition-all duration-300 rounded-md `}
+                  ? "bg-blue-400 text-white hover:bg-blue-500"
+                  : "bg-slate-300 text-grey cursor-not-allowed"
+              } py-2 px-5 my-12 mx-auto w-1/3 transition-all duration-300 rounded-md`}
             >
               Sign Up
             </button>

@@ -25,7 +25,7 @@ export default function RootLayoutContext({
     } else {
       timer = setTimeout(() => {
         setShowLoading(false);
-      }, 3000); 
+      }, 1800); 
     }
     return () => clearTimeout(timer);
   }, [sessionStatus]);

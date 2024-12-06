@@ -7,18 +7,15 @@ export async function POST(req: NextRequest) {
   const secretKey = process.env.JWT_SECRET || "";
   try {
     const { verificationCode } = await req.json();
-
     if (!verificationCode) {
       return new NextResponse(
         JSON.stringify({ error: "Verification code is required." }),
         { status: 400 }
       );
     }
-
     const user = await prisma.user.findFirst({
       where: { verificationCode },
     });
-
     if (!user) {
       return new NextResponse(JSON.stringify({ error: "User not found." }), {
         status: 400,
@@ -38,7 +35,6 @@ export async function POST(req: NextRequest) {
         verificationCode: null,
       },
     });
-
     // Generate a new token with the updated isVerified value
     const payload = {
       user: {
@@ -49,7 +45,6 @@ export async function POST(req: NextRequest) {
         isVerified: updatedUser.isVerified, 
       },
     };
-
     // Sign a new token with the updated payload
     const newToken = jwt.sign(payload, secretKey, { expiresIn: "1d" });
 

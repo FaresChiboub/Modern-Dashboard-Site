@@ -8,6 +8,24 @@ import fs from "fs";
 import path from "path";
 import { randomInt } from "crypto";
 import Handlebars from "handlebars";
+import { zxcvbnAsync } from '@zxcvbn-ts/core';
+import { zxcvbn, zxcvbnOptions } from "@zxcvbn-ts/core";
+import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
+import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
+import { matcherPwnedFactory } from "@zxcvbn-ts/matcher-pwned";
+const matcherPwned = matcherPwnedFactory(fetch, zxcvbnOptions);
+zxcvbnOptions.addMatcher("pwned", matcherPwned);
+const options = {
+  dictionary: {
+    ...zxcvbnCommonPackage.dictionary,
+    ...zxcvbnEnPackage.dictionary,
+    ...zxcvbnEnPackage.dictionary,
+  },
+  graphs: zxcvbnCommonPackage.adjacencyGraphs,
+  useLevenshteinDistance: true,
+  translations: zxcvbnEnPackage.translations,
+};
+zxcvbnOptions.setOptions(options);
 
 export async function POST(req: NextRequest) {
   const secretKey = process.env.JWT_SECRET || "";
@@ -17,8 +35,10 @@ export async function POST(req: NextRequest) {
       "JWT_SECRET or JWT_REFRESH_SECRET is not defined in environment variables."
     );
   }
+
   try {
     const { username, email, password, role } = await req.json();
+
     // Validate fields
     if (!username || !email || !password) {
       return new NextResponse(
@@ -29,27 +49,62 @@ export async function POST(req: NextRequest) {
         }
       );
     }
-    // Check if user already exists
-    const existingUser = await prisma.user.findUnique({ where: { email } });
-    if (existingUser) {
+
+    // Password strength check
+    const passwordStrength = await zxcvbnAsync(password);
+    const passwordScore = passwordStrength.score;
+
+    let passwordMessage = "";
+
+    if (passwordScore === 0) {
+      passwordMessage = "Password is too guessable: risky password.";
+    } else if (passwordScore === 1) {
+      passwordMessage =
+        "Password is very guessable: protection from throttled online attacks.";
+    } else if (passwordScore === 2) {
+      passwordMessage =
+        "Password is somewhat guessable: protection from unthrottled online attacks.";
+    } else if (passwordScore === 3) {
+      passwordMessage =
+        "Password is safely unguessable: moderate protection from offline slow-hash scenarios.";
+    } else if (passwordScore === 4) {
+      passwordMessage =
+        "Password is very strong: great protection from offline slow-hash scenarios.";
+    }
+
+    // For weak passwords (score 0, 1, or 2), show message and don't proceed with registration
+    if (passwordScore < 3) {
       return new NextResponse(
-        JSON.stringify({ error: { message: "User already exists!" } }),
+        JSON.stringify({ error: { message: passwordMessage } }),
         {
-          status: 409,
+          status: 400,
           headers: { "Content-Type": "application/json" },
         }
       );
     }
-    const existingName = await prisma.user.findUnique({ where: { username } });
-    if (existingName) {
+
+    // Check if user already exists (email and username)
+    const [existingUserByEmail, existingUserByUsername] = await Promise.all([
+      prisma.user.findUnique({ where: { email } }),
+      prisma.user.findUnique({ where: { username } }),
+    ]);
+
+    if (existingUserByEmail) {
+      return new NextResponse(
+        JSON.stringify({
+          error: { message: "User already exists with this email!" },
+        }),
+        { status: 409, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    if (existingUserByUsername) {
       return new NextResponse(
         JSON.stringify({ error: { message: "Username already exists!" } }),
-        {
-          status: 409,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 409, headers: { "Content-Type": "application/json" } }
       );
     }
+
     // Hash the password and create the user
     const salt = await bcrypt.genSalt(10);
     const hash = await bcrypt.hash(password, salt);
@@ -64,7 +119,6 @@ export async function POST(req: NextRequest) {
         verificationCode: verificationCode.toString(),
       },
     });
-   
 
     // Create JWT tokens
     const accessToken = jwt.sign(
@@ -79,6 +133,7 @@ export async function POST(req: NextRequest) {
       secretKey,
       { expiresIn: "1h" }
     );
+
     const refreshToken = jwt.sign(
       {
         user: {
@@ -91,23 +146,36 @@ export async function POST(req: NextRequest) {
       refreshKey,
       { expiresIn: "7d" }
     );
-    // Store tokens in cookies
+
+    // Set cookies
     const cookieStore = await cookies();
     cookieStore.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 1 * 60 * 60, // 1 hour for access token
+      maxAge: 1 * 60 * 60,
     });
     cookieStore.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60, // 7 days for refresh token
+      maxAge: 7 * 24 * 60 * 60,
     });
+
     // Send email with verification code
+    const smtpEmail = process.env.SMTP_EMAIL;
+    if (!smtpEmail) {
+      return new NextResponse(
+        JSON.stringify({
+          error: { message: "SMTP email is missing in environment variables." },
+        }),
+        { status: 500, headers: { "Content-Type": "application/json" } }
+      );
+    }
+
+    // Send the email with verification code
     const filePath = path.join(
       process.cwd(),
       "public",
@@ -121,24 +189,7 @@ export async function POST(req: NextRequest) {
       username,
       verificationCode: verificationCode.toString(),
     });
-    const smtpEmail = `AC CORP ${process.env.SMTP_EMAIL}`;
-    if (!smtpEmail) {
-      return (
-        new NextResponse(
-          JSON.stringify({
-            error: {
-              message: "SMTP EMAIL IS MISSING IN ENVIRONMENT VARIABLES",
-            },
-          })
-        ),
-        {
-          status: 404,
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-    }
+
     await SendEmail({
       to: email,
       from: smtpEmail,
@@ -146,9 +197,10 @@ export async function POST(req: NextRequest) {
       text: `Your verification code is: ${verificationCode}`,
       html: htmlContent,
     });
+
     return new NextResponse(
       JSON.stringify({
-        message: "Account successfully created! Please verify your email.",
+        message: `Account successfully created! Please verify your email. Password strength: ${passwordMessage}`,
         user: { username, email },
       }),
       {

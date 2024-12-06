@@ -18,8 +18,7 @@ const LoginForm = () => {
       {/* Left side */}
       <div className="md:w-[65%] px-5 h-screen">
         <div className="flex items-center gap-1 py-5">
-          <Image src="/logo.png" alt="AF Logo" width={30} height={30} />
-          <h1 className="text-xl text-slate-500 font-bold">AF</h1>
+          <Image src="/logo.png" alt="AF Logo" width={60} height={60} />
         </div>
         <div className="flex flex-col gap-3 mt-32 text-center">
           <h1 className="w-full text-5xl md:w-[90%] mx-auto text-slate-900 font-bold py-3 leading-[4rem]">
