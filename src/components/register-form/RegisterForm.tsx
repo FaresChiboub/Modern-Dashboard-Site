@@ -51,6 +51,7 @@ const RegisterForm = () => {
   } = context;
 
   // Call the hook to get the password strength
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const result = usePasswordStrength(inputData.password);
   const score = result?.score ?? 0;
   const passwordStrengthScore = inputData.password ? score : null;

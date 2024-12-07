@@ -113,7 +113,28 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
   // Handle the login form submission
   async function handleSubmitLogin(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
+    try {
+      const responseLimit = await fetch("/api/rateLimitRoute", {
+        method: "GET",
+      });
+      const data = await responseLimit.json();
+      if (responseLimit.status === 429) {
+        toast({
+          variant: "destructive",
+          title: "Rate limit exceeded.",
+          description: `Remaining requests: ${data.remaining}/${data.limit}`,
+          action: (
+            <ToastAction altText=" Please try again later">
+              {" "}
+              Please try again later
+            </ToastAction>
+          ),
+        });
+        return;
+      }
+    } catch (error) {
+      console.error(error);
+    }
     const { email, password } = inputData;
     try {
       // Send a POST request to the login route
@@ -170,10 +191,31 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
       });
     }
   }
-
+  const recaptchaSiteKey = process.env.NEXT_PUBLIC_GOOGLE_RECAPTCHA_ID || "";
+  if (!recaptchaSiteKey) {
+    throw new Error("Failed to load Environment Variable !");
+  }
   // Handle the register form submission
   async function handleSubmitRegister(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    window.grecaptcha.ready(function () {
+      window.grecaptcha
+        .execute(recaptchaSiteKey, { action: "submit" })
+        .then((token: string) => {
+          console.log(token);
+          fetch("/api/recaptchaRoute", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ token }),
+          })
+            .then((res) => res.json())
+            .then((data) => console.log(data));
+        });
+    });
+
     const { username, email, password } = inputData;
 
     try {
@@ -253,7 +295,14 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
       });
     }
   }
-
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`;
+    script.async = true;
+    document.body.appendChild(script);
+    script.onload = () => "recaptcha script loaded successfully";
+    script.onerror = () => "recaptcha script failed to load";
+  }, [recaptchaSiteKey]);
   // Toggle password visibility
   function handleShowPassword(field: "password" | "confirmPassword") {
     setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
