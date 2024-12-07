@@ -11,9 +11,15 @@ import {
 import React, { useState } from "react";
 export default function Main() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState("idle");
+  const [status, setStatus] = useState(
+    "idle" || "loading" || "success " || "error"
+  );
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
+    // Set status to loading immediately when form is submitted
+    setStatus("loading");
+
     try {
       const response = await fetch("/api/newsletterRoute", {
         method: "POST",
@@ -22,21 +28,26 @@ export default function Main() {
         },
         body: JSON.stringify({ email }),
       });
+
+      // If the response is successful, set status to success
       if (!response.ok) {
         throw new Error("Failed to subscribe");
       } else {
         const data = await response.json();
-        return data;
+        console.log(data); // You can handle the response here
       }
+
+      // Set the status to success after the data is successfully fetched
+      setStatus("success");
+      setEmail(""); // Clear the email input after success
     } catch (error) {
       console.error(error);
+
+      // If an error occurs, set status to error
+      setStatus("error");
     }
-    setStatus("loading");
-    setTimeout(() => {
-      setStatus("success");
-      setEmail("");
-    }, 1000);
   }
+
   const benefits = [
     "Weekly data insights and analysis trends",
     "Exclusive dashboard templates and tutorials",
@@ -231,7 +242,10 @@ export default function Main() {
                         className="w-full flex items-center justify-center px-4 py-3 border border-transparent text-base font-medium rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
                       >
                         {status === "loading" ? (
-                          "Subscribing..."
+                          <>
+                            <Mail className="h-5 w-5 mr-2" />
+                            Subscribing...
+                          </>
                         ) : (
                           <>
                             <Mail className="h-5 w-5 mr-2" />
@@ -267,7 +281,7 @@ export default function Main() {
                         </div>
                       </div>
                     )}
-
+                    <form />
                     <p className="mt-4 text-center text-sm text-gray-500">
                       We respect your privacy. Unsubscribe at any time.
                     </p>

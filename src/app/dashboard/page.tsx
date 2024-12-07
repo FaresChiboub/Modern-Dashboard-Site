@@ -154,7 +154,7 @@ export default function Page() {
                   : "bg-white text-black"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
-              <div className="flex justify-between items-center">
+              <div className={`flex justify-between items-center`}>
                 <h6 className="text-uppercase text-sm mt-2">Revenue Target</h6>
                 <DollarSign className="text-4xl" />
               </div>
