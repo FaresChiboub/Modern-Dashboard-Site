@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import {
   Calendar,
   CreditCard,
@@ -22,9 +22,13 @@ import { useTheme } from "next-themes";
 
 // Updated CommandDemo for a professional dashboard
 export function CommandDemo() {
-  const {theme}=useTheme()
+  const { theme } = useTheme();
   return (
-<Command className={`w-[215px] ${theme === "dark" ? "bg-[hsl(240, 30%, 10%)] text-white" : "bg-white text-black"}`}>
+    <Command
+      className={`w-[215px] ${
+        theme === "dark" ? "bg-transparent text-white" : "bg-transparent text-black"
+      }`}
+    >
       <CommandInput placeholder="Search or enter command..." />
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>

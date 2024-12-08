@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
-import * as jose from "jose"; 
+import * as jose from "jose";
+import { getToken } from "next-auth/jwt";
 
 // Define the expected JWT payload structure
 interface UserPayload {
@@ -15,12 +16,21 @@ interface UserPayload {
 
 export async function middleware(req: NextRequest) {
   const cookieStore = await cookies();
-  const token = cookieStore.get("token")?.value || ""; 
-  const refreshToken = cookieStore.get("refreshToken")?.value; 
+  const token = cookieStore.get("token")?.value || "";
+  const refreshToken = cookieStore.get("refreshToken")?.value;
   const pathname = req.nextUrl.pathname;
+  const session = await getToken({
+    req,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  if (session) {
+    if (pathname.startsWith("/register") || pathname.startsWith("/login")) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
 
   // If no token exists and trying to access restricted paths, redirect to login
-  if (!token && !refreshToken) {
+  else if (!token && !refreshToken && !session) {
     if (pathname !== "/login" && pathname !== "/register") {
       return NextResponse.redirect(new URL("/login", req.url));
     }
@@ -49,11 +59,11 @@ export async function middleware(req: NextRequest) {
       const user = payload.user;
       const isVerified = user.isVerified;
       // Redirect if the user is not verified and trying to access protected pages
-      if (isVerified===false && !pathname.startsWith("/verify")) {
+      if (isVerified === false && !pathname.startsWith("/verify")) {
         return NextResponse.redirect(new URL("/verify", req.url));
       }
       // Redirect if the user is verified and trying to access the /verify page
-      if (isVerified===true && pathname.startsWith("/verify")) {
+      if (isVerified === true && pathname.startsWith("/verify")) {
         return NextResponse.redirect(new URL("/", req.url));
       }
 

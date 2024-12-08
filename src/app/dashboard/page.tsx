@@ -63,8 +63,8 @@ export default function Page() {
             <div
               className={`${
                 theme === "dark"
-                  ? "bg-blue-900/30 text-white"
-                  : "bg-white text-black"
+                  ? "bg-slate-950 text-white"
+                  : "bg-transparent text-black"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
               <div className="flex justify-between items-center">
@@ -94,8 +94,8 @@ export default function Page() {
             <div
               className={`${
                 theme === "dark"
-                  ? "bg-blue-900/30 text-white"
-                  : "bg-white text-black"
+                  ? "bg-slate-950 text-white"
+                  : "bg-transparent text-black"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
               <div className="flex justify-between items-center">
@@ -120,8 +120,8 @@ export default function Page() {
             <div
               className={`${
                 theme === "dark"
-                  ? "bg-blue-900/30 text-white"
-                  : "bg-white text-black"
+                  ? "bg-slate-950 text-white"
+                  : "bg-transparent text-black"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
               <div className="flex justify-between items-center">
@@ -150,8 +150,8 @@ export default function Page() {
             <div
               className={`${
                 theme === "dark"
-                  ? "bg-blue-900/30 text-white"
-                  : "bg-white text-black"
+                  ? "bg-slate-950 text-white"
+                  : "bg-transparent text-black"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
               <div className={`flex justify-between items-center`}>
@@ -178,26 +178,27 @@ export default function Page() {
           </div>
 
           {/* Graph Section */}
-          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 m gap-4 mt-6">
+          <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 m gap-5 mt-6">
             <div className="rounded-xl h-64">
               <DonutChart1 />
             </div>
             <div className="rounded-xl h-64">
               <RadarChart1 />
             </div>
-            <div className="rounded-xl h-64 ">
+            <div className="rounded-xl h-64 mt-4 ">
               <BarChartComponent />
             </div>
-            <div>
+            <div className="rounded-xl h-64 mt-4 ">
               <RadialChart2 />
             </div>
           </div>
 
-          <div className="flex-1 rounded-xl md:min-h-min" />
+          <div className="flex-1 rounded-xl md:min-h-min mt-4">
           <LargeAreaChart />
         </div>
         <div>
           <TableComp />
+        </div>
         </div>
       </SidebarInset>
       <SidebarRight />
