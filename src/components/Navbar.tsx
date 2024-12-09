@@ -3,7 +3,7 @@ import React, { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -108,12 +108,11 @@ function Navbar() {
                     <Avatar>
                       <Image
                         className="cursor-pointer"
-                        src={user?.image || "user.png"}
+                        src={user?.image || "img.png"}
                         alt="user image"
                         width={40}
                         height={40}
                       />
-                      <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="text-gray-600 hover:text-gray-900 bg-white ">

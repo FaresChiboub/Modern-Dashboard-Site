@@ -1,34 +1,10 @@
 "use client";
 import Loading from "@/components/loading/loading";
-import { UserFormContext } from "@/context/UserFormContext";
-import React, { ChangeEvent, useContext, useEffect, useState } from "react";
-interface objEntriesState {
-  image: string | null;
-  upload: boolean;
-  success: string;
-  error: string;
-}
+import { UploadImageContext } from "@/context/UploadImageContext";
+import React from "react";
+
 const ProfilePage: React.FC = () => {
-  const [objInput, setObjInput] = useState<objEntriesState>({
-    image: null,
-    upload: false,
-    success: "",
-    error: "",
-  });
-  // Reset success and error messages after 3 seconds
-  useEffect(() => {
-    if (objInput.success || objInput.error) {
-      const timeout = setTimeout(() => {
-        setObjInput((prev) => ({
-          ...prev,
-          success: "",
-          error: "",
-        }));
-      }, 5000);
-      return () => clearTimeout(timeout);
-    }
-  }, [objInput.success, objInput.error]);
-  const context = useContext(UserFormContext);
+  const context = React.useContext(UploadImageContext);
   if (!context) {
     return (
       <div>
@@ -36,70 +12,10 @@ const ProfilePage: React.FC = () => {
       </div>
     );
   }
-  const { updateProfileImage } = context;
-
-  // Handle the image preview and upload
-  function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    // Validate file type
-    const imgMemeType = /\.(jpe?g|png|gif)$/i.test(file.name);
-    if (imgMemeType) {
-      // Start the upload process
-      setObjInput((prev) => ({
-        ...prev,
-        image: null,
-        upload: true,
-        success: "",
-        error: "",
-      }));
-
-      const reader = new FileReader();
-      //Successful upload
-      reader.onload = () => {
-        setTimeout(() => {
-          setObjInput((prev) => ({
-            ...prev,
-            image: reader.result as string,
-            upload: false,
-            success: "Image uploaded successfully!",
-            error: "",
-          }));
-          const uploadedImage = reader.result as string;
-          updateProfileImage(uploadedImage);
-        }, 2000);
-      };
-      //Failed upload
-      reader.onerror = () => {
-        setTimeout(() => {
-          setObjInput((prev) => ({
-            ...prev,
-            image: null,
-            upload: false,
-            success: "",
-            error: "Failed to upload image. Please try again.",
-          }));
-        }, 2000);
-      };
-
-      reader.readAsDataURL(file);
-    } else {
-      //Invalid file type
-      setTimeout(() => {
-        setObjInput((prev) => ({
-          ...prev,
-          image: null,
-          success: "",
-          error: "Invalid file type. Please upload a JPG, PNG, or GIF ⚠️",
-          upload: false,
-        }));
-      }, 2000);
-    }
-  }
-
-  const picture = objInput.image;
-  const uploadingProcess = "Uploading...";
-
+  const { updateProfileImage,picture,uploadingProcess,objInput,handleImageUpload } = context;
+  
+  
+  
   return (
     <div className="h-screen bg-white flex justify-center items-center gap-7 flex-col">
       {/* Image Preview Section */}

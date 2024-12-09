@@ -14,6 +14,7 @@ import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
 import { signOut, useSession } from "next-auth/react";
 import { deleteCookie } from "cookies-next/client";
+import { UploadImageContext } from "./UploadImageContext";
 
 // Defining the types for children props and form events context
 interface childrenProps {
@@ -26,8 +27,7 @@ interface formEventsProps {
   handleSubmitLogin: (e: FormEvent<HTMLFormElement>) => void;
   handleSubmitRegister: (e: FormEvent<HTMLFormElement>) => void;
   handleShowPassword: (field: "password" | "confirmPassword") => void;
-  profileImage: string | null;
-  updateProfileImage: (imageUrl: string) => void;
+
   handleLogout: () => void;
   user: User | null;
 
@@ -67,11 +67,7 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
-  const [profileImage, setProfileImage] = useState<string | null>(null);
 
-  const updateProfileImage = (imageUrl: string) => {
-    setProfileImage(imageUrl);
-  };
   // Get the current date and time to display in the toast notifications
   const currentDate = new Date().toLocaleString("en-US", {
     year: "numeric",
@@ -100,7 +96,8 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
     confirmPassword: "",
     email: "",
   });
-
+  const context = React.useContext(UploadImageContext);
+  const { profileImage, setProfileImage } = context;
   // Function to handle changes in form inputs (username, password, email)
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const { id, value } = e.target;
@@ -387,11 +384,10 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         setProfileImage(profileImage || data.image);
       } else {
         setUser(null);
-        setProfileImage(null);
       }
     };
     fetchData();
-  }, [profileImage, session]);
+  }, [profileImage, session, setProfileImage]);
 
   return (
     // Provide the form events and state through context to the child components
@@ -408,8 +404,6 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         redirectToLogin,
         user,
         handleLogout,
-        profileImage,
-        updateProfileImage,
       }}
     >
       {children}

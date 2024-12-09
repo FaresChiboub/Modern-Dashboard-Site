@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Loading from "../loading/loading";
 import { useEffect, useState } from "react";
-
+import UploadImageContextProvider from "@/context/UploadImageContext";
 export default function RootLayoutContext({
   children,
 }: Readonly<{
@@ -25,7 +25,7 @@ export default function RootLayoutContext({
     } else {
       timer = setTimeout(() => {
         setShowLoading(false);
-      }, 1800); 
+      }, 1800);
     }
     return () => clearTimeout(timer);
   }, [sessionStatus]);
@@ -39,17 +39,19 @@ export default function RootLayoutContext({
   }
   return (
     <main>
-      <UserFormContextProvider>
-        {pathname !== "/login" &&
-          pathname !== "/register" &&
-          pathname !== "/verify" &&
-          pathname !== "/dashboard" && <Navbar />}
-        {children}
-        {pathname !== "/login" &&
-          pathname !== "/register" &&
-          pathname !== "/verify" &&
-          pathname !== "/dashboard" && <Footer />}
-      </UserFormContextProvider>
+      <UploadImageContextProvider>
+        <UserFormContextProvider>
+          {pathname !== "/login" &&
+            pathname !== "/register" &&
+            pathname !== "/verify" &&
+            pathname !== "/dashboard" && <Navbar />}
+          {children}
+          {pathname !== "/login" &&
+            pathname !== "/register" &&
+            pathname !== "/verify" &&
+            pathname !== "/dashboard" && <Footer />}
+        </UserFormContextProvider>
+      </UploadImageContextProvider>
     </main>
   );
 }
