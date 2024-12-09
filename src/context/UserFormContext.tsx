@@ -26,6 +26,8 @@ interface formEventsProps {
   handleSubmitLogin: (e: FormEvent<HTMLFormElement>) => void;
   handleSubmitRegister: (e: FormEvent<HTMLFormElement>) => void;
   handleShowPassword: (field: "password" | "confirmPassword") => void;
+  profileImage: string | null;
+  updateProfileImage: (imageUrl: string) => void;
   handleLogout: () => void;
   user: User | null;
 
@@ -65,6 +67,11 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [user, setUser] = useState<User | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+
+  const updateProfileImage = (imageUrl: string) => {
+    setProfileImage(imageUrl);
+  };
   // Get the current date and time to display in the toast notifications
   const currentDate = new Date().toLocaleString("en-US", {
     year: "numeric",
@@ -369,20 +376,22 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         setUser({
           username: session.user.name || "Guest",
           email: session.user.email || "",
-          image: session.user.image || "",
+          image: session.user.image || profileImage,
         });
       } else if (data && data.username) {
         setUser({
           username: data.username || {},
           email: data.email || "",
-          image: data.image || "",
+          image: profileImage || data.image,
         });
+        setProfileImage(profileImage || data.image);
       } else {
         setUser(null);
+        setProfileImage(null);
       }
     };
     fetchData();
-  }, [session]);
+  }, [profileImage, session]);
 
   return (
     // Provide the form events and state through context to the child components
@@ -399,6 +408,8 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         redirectToLogin,
         user,
         handleLogout,
+        profileImage,
+        updateProfileImage,
       }}
     >
       {children}

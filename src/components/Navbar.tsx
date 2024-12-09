@@ -108,7 +108,7 @@ function Navbar() {
                     <Avatar>
                       <Image
                         className="cursor-pointer"
-                        src={user?.image || "/user.png"}
+                        src={user?.image || "user.png"}
                         alt="user image"
                         width={40}
                         height={40}
@@ -175,7 +175,6 @@ function Navbar() {
                       height={40}
                       className="cursor-pointer"
                     />
-                    <AvatarFallback>CN</AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
