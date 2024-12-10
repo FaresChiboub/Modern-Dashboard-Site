@@ -49,8 +49,14 @@ const UploadImageContextProvider = ({ children }: ChildrenProps) => {
 
   const updateProfileImage = (imageUrl: string) => {
     setProfileImage(imageUrl);
+    localStorage.setItem("profileImage", imageUrl);
   };
-
+  useEffect(() => {
+    const savedPicture = localStorage.getItem("profileImage");
+    if (savedPicture) {
+      setProfileImage(savedPicture);
+    }
+  }, []);
   // State to track the image upload status and messages
   const [objInput, setObjInput] = useState<ObjEntriesState>({
     image: null,

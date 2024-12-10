@@ -15,6 +15,7 @@ import {
 import { Menu, X } from "lucide-react";
 import { UserFormContext } from "@/context/UserFormContext";
 import Loading from "./loading/loading";
+import { AvatarFallback } from "@radix-ui/react-avatar";
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -108,17 +109,20 @@ function Navbar() {
                     <Avatar>
                       <Image
                         className="cursor-pointer"
-                        src={user?.image || "img.png"}
+                        src={user?.image || "/user.png"}
                         alt="user image"
                         width={40}
                         height={40}
                       />
+                      <AvatarFallback>CV</AvatarFallback>
                     </Avatar>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="text-gray-600 hover:text-gray-900 bg-white ">
-                    <DropdownMenuItem className="cursor-pointer hover:bg-blue-500 hover:text-white ">
-                      Profile
-                    </DropdownMenuItem>
+                    <Link href={"/profile"}>
+                      <DropdownMenuItem className="cursor-pointer hover:bg-blue-500 hover:text-white ">
+                        Profile
+                      </DropdownMenuItem>
+                    </Link>
                     <Link href="/blog">
                       <DropdownMenuItem className="cursor-pointer hover:bg-blue-500 hover:text-white  ">
                         Blog

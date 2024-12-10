@@ -7,6 +7,7 @@ import React, {
   ChangeEvent,
   FormEvent,
   useEffect,
+  useContext,
 } from "react";
 
 import { useRouter } from "next/navigation";
@@ -96,7 +97,7 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
     confirmPassword: "",
     email: "",
   });
-  const context = React.useContext(UploadImageContext);
+  const context = useContext(UploadImageContext);
   const { profileImage, setProfileImage } = context;
   // Function to handle changes in form inputs (username, password, email)
   function handleChange(e: ChangeEvent<HTMLInputElement>) {
@@ -373,21 +374,20 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         setUser({
           username: session.user.name || "Guest",
           email: session.user.email || "",
-          image: session.user.image || profileImage,
+          image: profileImage || session.user.image || "",
         });
       } else if (data && data.username) {
         setUser({
           username: data.username || {},
           email: data.email || "",
-          image: profileImage || data.image,
+          image: profileImage,
         });
-        setProfileImage(profileImage || data.image);
       } else {
         setUser(null);
       }
     };
     fetchData();
-  }, [profileImage, session, setProfileImage]);
+  }, [session, profileImage]);
 
   return (
     // Provide the form events and state through context to the child components

@@ -12,10 +12,13 @@ const ProfilePage: React.FC = () => {
       </div>
     );
   }
-  const { updateProfileImage,picture,uploadingProcess,objInput,handleImageUpload } = context;
-  
-  
-  
+  const {
+    updateProfileImage,
+    picture,
+    uploadingProcess,
+    objInput,
+    handleImageUpload,
+  } = context;
   return (
     <div className="h-screen bg-white flex justify-center items-center gap-7 flex-col">
       {/* Image Preview Section */}
@@ -46,7 +49,7 @@ const ProfilePage: React.FC = () => {
       {/* File Input */}
       <input
         type="file"
-        className="w-[200px] bg-blue-500 text-white rounded-sm"
+        className="w-[250px] bg-black rounded-md flex text-md file:py-2 file:px-4 file:mr-4 file:border-0 file:text-white file:bg-blue-500 file:rounded-md file:cursor-pointer"
         onChange={handleImageUpload}
       />
 
@@ -67,8 +70,13 @@ const ProfilePage: React.FC = () => {
         </div>
       )}
       <button
+        disabled={objInput.image ? false : true}
         onClick={() => updateProfileImage(objInput.image as string)}
-        className="border bg-green-500 mt-8 text-white text-sm font-bold px-5 py-1"
+        className={`${
+          !objInput.image
+            ? "border bg-gray-300 mt-8 text-white text-sm font-bold px-5 py-1 cursor-not-allowed rounded-md"
+            : "border bg-green-900 mt-8 rounded-md text-white text-sm font-bold px-5 py-1"
+        }`}
       >
         Set Profile Image
       </button>
