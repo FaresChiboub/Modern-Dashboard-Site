@@ -95,8 +95,8 @@ const VerifyPage = () => {
   }
 
   return (
-    <div className="h-screen bg-white text-2xl text-black font-bold flex justify-center items-center flex-col">
-      <h1 className="text-black py-10">Enter Verification Code</h1>
+    <div className="h-screen bg-black text-center text-2xl px-5 text-white font-bold flex justify-center items-center flex-col">
+      <h1 className="py-5">Check your Email Address for the Verification Code</h1>
       <div className="py-4">
         {/* Custom input area for OTP */}
         <input
@@ -104,25 +104,26 @@ const VerifyPage = () => {
           value={otp}
           onChange={handleOtpChange}
           maxLength={6}
-          className="h-16 w-64 text-3xl bg-black text-white text-center border-2 border-gray-300 rounded-lg"
+          className="h-16 w-64 text-3xl bg-white text-black text-center border-2 border-gray-300 rounded-lg"
           placeholder="Enter OTP"
           inputMode="numeric"
         />
       </div>
       <button
         onClick={handleSubmit}
-        className="text-sm border rounded-lg mt-6 px-11 py-3 bg-blue-500 text-white"
+        className="text-sm border rounded-lg mt-6 px-11 py-3 bg-green-700"
         type="button"
       >
         Submit
       </button>
-      <div className=" border-x-2 px-5 border-y-2 border-dotted border-black flex flex-col py-3 items-center justify-center mt-12">
-        <p className="py-3 text-sm ml-5">
+      <div className=" border-x-2 px-5 border-y-2 border-dotted border-red-500 rounded-sm flex flex-col py-3 items-center justify-center mt-12">
+      ⚠️
+        <p className="py-3 text-sm ml-5 text-red-500">
           Can&apos;t access Verification code ?
         </p>
         <button
           onClick={handleLogout}
-          className="text-sm border rounded-lg  px-11 py-3 bg-red-500 text-white"
+          className="text-sm rounded-lg px-11 py-2 bg-red-800 text-white"
           type="button"
         >
           Logout

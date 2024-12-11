@@ -8,11 +8,12 @@ import fs from "fs";
 import path from "path";
 import { randomInt } from "crypto";
 import Handlebars from "handlebars";
-import { zxcvbnAsync } from '@zxcvbn-ts/core';
-import { zxcvbn, zxcvbnOptions } from "@zxcvbn-ts/core";
+import { zxcvbnAsync } from "@zxcvbn-ts/core";
+import { zxcvbnOptions } from "@zxcvbn-ts/core";
 import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { matcherPwnedFactory } from "@zxcvbn-ts/matcher-pwned";
+import validator from "validator";
 const matcherPwned = matcherPwnedFactory(fetch, zxcvbnOptions);
 zxcvbnOptions.addMatcher("pwned", matcherPwned);
 const options = {
@@ -38,7 +39,23 @@ export async function POST(req: NextRequest) {
 
   try {
     const { username, email, password, role } = await req.json();
-
+    if (!validator.isEmail(email)) {
+      return new NextResponse(
+        JSON.stringify({ error: { message: "Invalid email format!" } }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    const usernamePart = email.split("@")[0];
+    const usernameRegex = /^[A-Za-z][A-Za-z0-9._%+-]*[A-Za-z]+$/;
+    if (!usernameRegex.test(usernamePart)) {
+      return new NextResponse(
+        JSON.stringify({
+          error: { message: "Email username cannot be only numbers!" },
+        }),
+        { status: 400, headers: { "Content-Type": "application/json" } }
+      );
+    }
+    const sanitizedEmail = email.trim().toLowerCase();
     // Validate fields
     if (!username || !email || !password) {
       return new NextResponse(
@@ -85,7 +102,7 @@ export async function POST(req: NextRequest) {
 
     // Check if user already exists (email and username)
     const [existingUserByEmail, existingUserByUsername] = await Promise.all([
-      prisma.user.findUnique({ where: { email } }),
+      prisma.user.findUnique({ where: { email:sanitizedEmail } }),
       prisma.user.findUnique({ where: { username } }),
     ]);
 
@@ -113,7 +130,7 @@ export async function POST(req: NextRequest) {
       data: {
         username,
         password: hash,
-        email,
+        email:sanitizedEmail,
         role,
         isVerified: false,
         verificationCode: verificationCode.toString(),
@@ -191,7 +208,7 @@ export async function POST(req: NextRequest) {
     });
 
     await SendEmail({
-      to: email,
+      to: sanitizedEmail,
       from: smtpEmail,
       subject: "Welcome to Our Service",
       text: `Your verification code is: ${verificationCode}`,

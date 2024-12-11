@@ -12,14 +12,7 @@ import { UserFormContext } from "@/context/UserFormContext";
 import { signIn } from "next-auth/react";
 import { zxcvbnAsync } from "@zxcvbn-ts/core";
 import PasswordMeter from "../password-meter/PasswordMeter";
-
-interface ZxcvbnResult {
-  score: number;
-  feedback: {
-    suggestions: string[];
-    warnings: string[];
-  };
-}
+import { ZxcvbnResult } from "@zxcvbn-ts/core";
 
 // Custom hook for password strength
 const usePasswordStrength = (password: string) => {

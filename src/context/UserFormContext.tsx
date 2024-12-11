@@ -16,7 +16,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { signOut, useSession } from "next-auth/react";
 import { deleteCookie } from "cookies-next/client";
 import { UploadImageContext } from "./UploadImageContext";
-
+import validator from "validator";
 // Defining the types for children props and form events context
 interface childrenProps {
   children: ReactNode;
@@ -28,6 +28,7 @@ interface formEventsProps {
   handleSubmitLogin: (e: FormEvent<HTMLFormElement>) => void;
   handleSubmitRegister: (e: FormEvent<HTMLFormElement>) => void;
   handleShowPassword: (field: "password" | "confirmPassword") => void;
+  setProfileImage: (imgUrl: string) => void;
 
   handleLogout: () => void;
   user: User | null;
@@ -222,6 +223,15 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
     });
 
     const { username, email, password } = inputData;
+    if (!validator.isEmail(email)) {
+      toast({
+        variant: "destructive",
+        title: "Invalid Email Format",
+        description: "Please enter a valid email address.",
+        action: <ToastAction altText="Try again">Try again</ToastAction>,
+      });
+      return;
+    }
 
     try {
       // Send a POST request to the register route
@@ -374,7 +384,7 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         setUser({
           username: session.user.name || "Guest",
           email: session.user.email || "",
-          image: profileImage || session.user.image || "",
+          image: session.user.image || "",
         });
       } else if (data && data.username) {
         setUser({
@@ -404,6 +414,7 @@ const UserFormContextProvider = ({ children }: childrenProps) => {
         redirectToLogin,
         user,
         handleLogout,
+        setProfileImage,
       }}
     >
       {children}

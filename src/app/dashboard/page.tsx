@@ -27,7 +27,8 @@ import { TableComp } from "@/components/tableComp";
 import { ModeToggle } from "@/components/mode-toggle";
 import { useTheme } from "next-themes";
 import { RadialChart2 } from "@/components/radialChart2";
-
+import { Home } from "lucide-react";
+import Link from "next/link";
 export default function Page() {
   const { theme } = useTheme();
 
@@ -44,7 +45,7 @@ export default function Page() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbPage className="line-clamp-1">
+                  <BreadcrumbPage className="line-clamp-1 font-bold">
                     Project Management & Task Tracking
                   </BreadcrumbPage>
                 </BreadcrumbItem>
@@ -54,6 +55,14 @@ export default function Page() {
           <div className="px-5">
             <ModeToggle />
           </div>
+          <Link href="/">
+            <div className="px-5 flex gap-2 items-center justify-center">
+              <span>
+                <Home size={14} />
+              </span>
+              <h1>Home</h1>
+            </div>
+          </Link>
         </header>
 
         <div className={`flex flex-col gap-4 p-4`}>
@@ -194,11 +203,11 @@ export default function Page() {
           </div>
 
           <div className="flex-1 rounded-xl md:min-h-min mt-4">
-          <LargeAreaChart />
-        </div>
-        <div>
-          <TableComp />
-        </div>
+            <LargeAreaChart />
+          </div>
+          <div>
+            <TableComp />
+          </div>
         </div>
       </SidebarInset>
       <SidebarRight />
