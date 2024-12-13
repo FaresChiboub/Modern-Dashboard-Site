@@ -11,7 +11,9 @@ interface EmailProps {
 export async function SendEmail({ to, from, subject, text, html }: EmailProps) {
   try {
     const transporter = nodemailer.createTransport({
-      service: process.env.SMTP_SERVICE,
+      host,
+      port,
+      secure,
       auth: {
         user: process.env.SMTP_EMAIL,
         pass: process.env.SMTP_PASSWORD,
