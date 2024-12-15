@@ -3,6 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   const { token } = await req.json();
   const recaptchaSecretKey = process.env.GOOGLE_RECAPTCHA_SECRET;
+
+  // Check if the secret key is missing
   if (!recaptchaSecretKey) {
     return new NextResponse(
       JSON.stringify({
@@ -16,7 +18,9 @@ export async function POST(req: NextRequest) {
       }
     );
   }
+
   try {
+    // Make a POST request to Google's reCAPTCHA verification endpoint
     const response = await fetch(
       "https://www.google.com/recaptcha/api/siteverify",
       {
@@ -30,18 +34,28 @@ export async function POST(req: NextRequest) {
         }),
       }
     );
-    if (!response) {
+
+    // Check for HTTP errors in the response
+    if (!response.ok) {
       return new NextResponse(
-        JSON.stringify({ error: { message: "Invalid URL ! No Response" } }),
+        JSON.stringify({
+          error: {
+            message: `Failed to verify reCAPTCHA, status: ${response.status}`,
+          },
+        }),
         {
-          status: 400,
+          status: 500,
           headers: {
             "Content-Type": "application/json",
           },
         }
       );
     }
+
+    // Parse the response body
     const data = await response.json();
+
+    // Check the reCAPTCHA verification response
     if (data.success) {
       return new NextResponse(
         JSON.stringify({ message: "reCAPTCHA verified successfully", data }),
@@ -53,6 +67,7 @@ export async function POST(req: NextRequest) {
         }
       );
     } else {
+      // Return an error response if verification failed
       return new NextResponse(
         JSON.stringify({
           error: {
@@ -64,9 +79,12 @@ export async function POST(req: NextRequest) {
       );
     }
   } catch (error) {
-    console.error("error fetching url", error);
+    // Log the error and return a 500 response
+    console.error("Error during reCAPTCHA verification:", error);
     return new NextResponse(
-      JSON.stringify({ error: { message: "Internal Error" } }),
+      JSON.stringify({
+        error: { message: "Internal Error during reCAPTCHA verification" },
+      }),
       {
         status: 500,
         headers: {

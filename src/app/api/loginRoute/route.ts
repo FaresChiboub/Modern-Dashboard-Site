@@ -78,7 +78,8 @@ export async function POST(req: NextRequest) {
     cookieStore.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+
       path: "/",
       maxAge: 19 * 60 * 60, // Access token expires in 19 hours
     });
@@ -86,7 +87,8 @@ export async function POST(req: NextRequest) {
     cookieStore.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+
       path: "/",
       maxAge: 7 * 24 * 60 * 60, // Refresh token expires in 7 days
     });

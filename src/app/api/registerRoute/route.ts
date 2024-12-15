@@ -169,14 +169,14 @@ export async function POST(req: NextRequest) {
     cookieStore.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       path: "/",
       maxAge: 1 * 60 * 60,
     });
     cookieStore.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
       path: "/",
       maxAge: 7 * 24 * 60 * 60,
     });
