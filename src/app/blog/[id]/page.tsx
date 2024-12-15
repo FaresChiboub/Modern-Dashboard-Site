@@ -4,20 +4,53 @@ import React, { useEffect, useState } from "react";
 import postData from "./id-posts.json";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 
-interface paramsProps {
-  params: {
-    id: string;
-  };
+// Post-related types
+interface Section {
+  title: string;
+  content: string;
+  quote: string;
 }
 
-export default function BlogPost({ params }: paramsProps) {
-  const [post, setPost] = useState<any>(null);
-  const { id } = React.use(params);
-  console.log(post);
+interface Author {
+  name: string;
+  avatar: string;
+  bio: string;
+}
+
+interface RelatedPost {
+  id: string;
+  title: string;
+  image: string;
+  category: string;
+}
+
+interface Post {
+  id: string | number;
+  title: string;
+  image: string;
+  category: string;
+  date: string;
+  author: Author;
+  content: {
+    introduction: string;
+    sections: Section[];
+  };
+  relatedPosts: RelatedPost[];
+  excerpt?: string;
+}
+
+export default function BlogPost() {
+  const [post, setPost] = useState<Post | null>(null);
+
+  // Unwrap the params using React.use() hook
+  const { id } = useParams() as { id: string };
+
   useEffect(() => {
-    const posts = postData.find((post) => post.id.toString() === id);
-    setPost(posts);
+    // Find the post based on the id from the URL
+    const foundPost = postData.find((post) => post.id.toString() === id);
+    setPost(foundPost as Post | null);
   }, [id]);
 
   if (!post) {
@@ -122,7 +155,7 @@ export default function BlogPost({ params }: paramsProps) {
               height={40}
             />
             <div>
-              <h3 className="font-bold text-xl mb-2 bg-gradient-to-tl from-blue-300 to-cyan-700 mb-4 bg-clip-text text-transparent">
+              <h3 className="font-bold text-xl bg-gradient-to-tl from-blue-300 to-cyan-700 mb-4 bg-clip-text text-transparent">
                 About {post.author.name}
               </h3>
               <p className="text-gray-600">{post.author.bio}</p>
@@ -133,7 +166,7 @@ export default function BlogPost({ params }: paramsProps) {
 
       <section className="bg-gray-50 py-16">
         <div className="container mx-auto max-w-6xl px-4">
-          <h2 className="text-3xl font-bold mb-8 bg-gradient-to-tl from-blue-300 to-cyan-700 mb-4 bg-clip-text text-transparent">
+          <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-300 to-cyan-700 mb-4 bg-clip-text text-transparent">
             Related post
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

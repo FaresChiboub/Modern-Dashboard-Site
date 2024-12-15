@@ -29,6 +29,6 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/components/DonutChart1.tsx"
-  ],
+, "src/lib/mail.ts"  ],
   "exclude": ["node_modules"]
 }

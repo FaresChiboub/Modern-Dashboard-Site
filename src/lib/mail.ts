@@ -10,6 +10,15 @@ interface EmailProps {
 
 export async function SendEmail({ to, from, subject, text, html }: EmailProps) {
   try {
+    const service = process.env.SMTP_SERVICE || "zoho";
+    let host, port, secure;
+
+    if (service === "zoho") {
+      host = process.env.SMTP_HOST || "smtp.zoho.com";
+      port = 465;
+      secure = true;
+    }
+
     const transporter = nodemailer.createTransport({
       host,
       port,

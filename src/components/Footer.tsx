@@ -14,7 +14,7 @@ export default function Footer() {
             <div className="flex items-center gap-2">
               <Link href="/">
                 <Image
-                  className="h-20 w-20"
+                  className="h-12 w-9"
                   src="/logo.png"
                   alt="DF Logo"
                   width={40}
@@ -103,10 +103,10 @@ export default function Footer() {
               <div className="flex items-center">
                 <Mail size={20} className="mr-2" />
                 <a
-                  href="mailto:contact@AF.com"
+                  href="ac327info@gmail.com"
                   className="hover:text-white transition-colors"
                 >
-                  contact@AF.com
+                  contact@AC.com
                 </a>
               </div>
               <div className="flex items-center">
@@ -120,7 +120,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div className="border-t border-cyan-300 py-4">
           <div className="text-center text-slate-100 text-sm sm:text-base">
-            © {new Date().getFullYear()} AF. All rights reserved.
+            © {new Date().getFullYear()} AC. All rights reserved.
           </div>
         </div>
       </div>

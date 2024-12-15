@@ -1,6 +1,6 @@
 [
   {
-    "id": 1,
+    "id": "1",
     "title": "The Future of Web Development",
     "excerpt": "Exploring upcoming trends in web development, from WebAssembly to Edge Computing and the evolution of JAMstack architecture.",
     "image": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -9,7 +9,7 @@
     "category": "Web Development"
   },
   {
-    "id": 2,
+    "id": "2",
     "title": "Mastering React Performance",
     "excerpt": "Deep dive into React optimization techniques, including memo, useMemo, and understanding the virtual DOM rendering process.",
     "image": "https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -18,7 +18,7 @@
     "category": "React"
   },
   {
-    "id": 3,
+    "id": "3",
     "title": "CSS Grid: A Complete Guide",
     "excerpt": "Everything you need to know about CSS Grid Layout, from basic concepts to advanced techniques and real-world applications.",
     "image": "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -27,7 +27,7 @@
     "category": "CSS"
   },
   {
-    "id": 4,
+    "id": "4",
     "title": "TypeScript Best Practices",
     "excerpt": "Learn how to write better TypeScript code with these proven patterns and practices from industry experts.",
     "image": "https://images.unsplash.com/photo-1516116216624-53e697fedbea?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -36,7 +36,7 @@
     "category": "TypeScript"
   },
   {
-    "id": 5,
+    "id": "5",
     "title": "Modern API Design",
     "excerpt": "Exploring RESTful and GraphQL API design patterns, authentication strategies, and best practices for scalability.",
     "image": "https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -45,7 +45,7 @@
     "category": "API"
   },
   {
-    "id": 6,
+    "id": "6",
     "title": "State Management in 2024",
     "excerpt": "Comparing modern state management solutions including Redux Toolkit, Zustand, Jotai, and built-in React features.",
     "image": "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -54,7 +54,7 @@
     "category": "State Management"
   },
   {
-    "id": 7,
+    "id": "7",
     "title": "AI in Web Development",
     "excerpt": "How artificial intelligence is transforming web development workflows and enhancing developer productivity.",
     "image": "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -63,7 +63,7 @@
     "category": "AI"
   },
   {
-    "id": 8,
+    "id": "8",
     "title": "Advanced Git Workflows",
     "excerpt": "Master complex Git operations and learn efficient collaboration strategies for large development teams.",
     "image": "https://images.unsplash.com/photo-1556075798-4825dfaaf498?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -72,7 +72,7 @@
     "category": "Git"
   },
   {
-    "id": 9,
+    "id": "9",
     "title": "Web Security Fundamentals",
     "excerpt": "Essential security practices every web developer should know to protect applications from common vulnerabilities.",
     "image": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",
@@ -81,7 +81,7 @@
     "category": "Security"
   },
   {
-    "id": 10,
+    "id": "10",
     "title": "The Future of Frontend Testing",
     "excerpt": "Exploring modern testing approaches including component testing, E2E testing, and visual regression testing.",
     "image": "https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80",

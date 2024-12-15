@@ -49,12 +49,6 @@ export async function middleware(req: NextRequest) {
     }
     return NextResponse.next();
   }
-  if (
-    (!token || !session || !refreshToken) &&
-    pathname.startsWith("/profile")
-  ) {
-    return NextResponse.redirect(new URL("/login", req.url));
-  }
   // If there is a token, validate it
   if (token) {
     try {

@@ -14,6 +14,8 @@ import { zxcvbnAsync } from "@zxcvbn-ts/core";
 import PasswordMeter from "../password-meter/PasswordMeter";
 import { ZxcvbnResult } from "@zxcvbn-ts/core";
 
+
+
 // Custom hook for password strength
 const usePasswordStrength = (password: string) => {
   const [result, setResult] = useState<ZxcvbnResult | null>(null);
@@ -52,7 +54,11 @@ const RegisterForm = () => {
   return (
     <div className="w-full h-screen flex flex-col smScreen:flex-row items-center overflow-hidden bg-slate-100 text-white">
       {/* Left side */}
+
       <div className="flex flex-col bg-cover bg-center justify-center items-center gap-5 w-full md:w-[35%] sm:w-full h-screen colorWave animate-gradient">
+        <div className="flex items-center justify-center gap-1 py-5">
+          <Image src="/logo.png" alt="AC Logo" width={60} height={60} />
+        </div>
         <h1 className="text-4xl font-bold py-3">One Of Us?</h1>
         <h3 className="leading-[2rem] px-2 text-center text-xl">
           If you already have an account, just sign in. We&apos;ve missed you!
@@ -66,11 +72,8 @@ const RegisterForm = () => {
       </div>
 
       {/* Right side */}
-      <div className="md:w-[65%] px-5 h-screen">
-        <div className="flex items-center gap-1 py-5">
-          <Image src="/logo.png" alt="AF Logo" width={60} height={60} />
-        </div>
-        <div className="flex flex-col gap-3 mt-32 text-center">
+      <div className="md:w-[65%] px-5 h-screen flex flex-col justify-center">
+        <div className="flex flex-col gap-3  text-center">
           <h1 className="w-full text-5xl md:w-[90%] mx-auto text-slate-900 font-bold py-3 leading-[4rem]">
             Create Free Account
           </h1>

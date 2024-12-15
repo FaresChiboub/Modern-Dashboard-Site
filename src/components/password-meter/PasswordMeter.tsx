@@ -1,8 +1,10 @@
 "use client";
 import { Progress } from "@/components/ui/progress";
 import { useState, useEffect } from "react";
-
-const PasswordMeter = ({ score }) => {
+interface PasswordMeterProps {
+  score: number | null;
+}
+const PasswordMeter:React.FC<PasswordMeterProps>  = ({ score }) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {

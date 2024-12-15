@@ -66,9 +66,9 @@ function Navbar() {
             <div className="flex items-center">
               <Link href="/">
                 <Image
-                  className="h-20 w-20"
+                  className="h-13 w-9"
                   src="/logo.png"
-                  alt="AF Logo"
+                  alt="AC Logo"
                   width={40}
                   height={40}
                 />

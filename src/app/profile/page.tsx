@@ -113,14 +113,15 @@ const ProfilePage: React.FC = () => {
                         objectFit="cover"
                       />
                     </div>
-                    <h4 className="text-xl font-bold mb-1">
-                      {capitalizeName}
-                    </h4>
+                    <h4 className="text-xl font-bold mb-1">{capitalizeName}</h4>
                   </div>
 
                   <div className="space-y-4">
                     <div>
-                      <label htmlFor="firstname" className="block font-bold text-slate-600 py-1">
+                      <label
+                        htmlFor="firstname"
+                        className="block font-bold text-slate-600 py-1"
+                      >
                         Firstname
                       </label>
                       <input
@@ -131,7 +132,10 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="lastname" className="block font-bold text-slate-600 py-1">
+                      <label
+                        htmlFor="lastname"
+                        className="block font-bold text-slate-600 py-1"
+                      >
                         Lastname
                       </label>
                       <input
@@ -142,7 +146,10 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="email" className="block font-bold text-slate-600 py-1">
+                      <label
+                        htmlFor="email"
+                        className="block font-bold text-slate-600 py-1"
+                      >
                         Email
                       </label>
                       <input
@@ -153,7 +160,10 @@ const ProfilePage: React.FC = () => {
                       />
                     </div>
                     <div>
-                      <label htmlFor="address" className="block font-bold text-slate-600 py-1">
+                      <label
+                        htmlFor="address"
+                        className="block font-bold text-slate-600 py-1"
+                      >
                         Address
                       </label>
                       <input
@@ -166,9 +176,7 @@ const ProfilePage: React.FC = () => {
                   </div>
 
                   <div className="mt-6">
-                    <h4 className="text-lg font-bold mb-2">
-                      Change Password
-                    </h4>
+                    <h4 className="text-lg font-bold mb-2">Change Password</h4>
                     <div className="space-y-4">
                       <div>
                         <label

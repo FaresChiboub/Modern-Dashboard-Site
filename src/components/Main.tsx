@@ -11,9 +11,7 @@ import {
 import React, { useState } from "react";
 export default function Main() {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState(
-    "idle" || "loading" || "success " || "error"
-  );
+  const [status, setStatus] = useState("idle");
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 

@@ -2,7 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import { SocialIcon } from "react-social-icons";
-import { Eye } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useContext } from "react";
 import { UserFormContext } from "@/context/UserFormContext";
 import { signIn } from "next-auth/react";
@@ -11,16 +11,20 @@ const LoginForm = () => {
   if (!context) {
     return <div>...Loading</div>;
   }
-  const { handleSubmitLogin, handleChange, inputData, redirectToRegister } =
-    context;
+
+  const {
+    handleSubmitLogin,
+    handleChange,
+    inputData,
+    redirectToRegister,
+    showPassword,
+    handleShowPassword,
+  } = context;
   return (
-    <div className=" bg-slate-100 w-full h-screen flex flex-col smScreen:flex-row items-center overflow-hidden">
+    <div className=" bg-slate-100 w-full h-screen flex flex-col smScreen:flex-row justify-center overflow-hidden">
       {/* Left side */}
-      <div className="md:w-[65%] px-5 h-screen">
-        <div className="flex items-center gap-1 py-5">
-          <Image src="/logo.png" alt="AF Logo" width={60} height={60} />
-        </div>
-        <div className="flex flex-col gap-3 mt-32 text-center">
+      <div className="md:w-[65%] px-5 h-screen flex flex-col justify-center">
+        <div className="flex flex-col gap-3 text-center ">
           <h1 className="w-full text-5xl md:w-[90%] mx-auto text-slate-900 font-bold py-3 leading-[4rem]">
             Login to Your Account
           </h1>
@@ -63,12 +67,19 @@ const LoginForm = () => {
                   id="password"
                   value={inputData.password}
                   onChange={handleChange}
-                  type="password"
+                  type={showPassword.password ? "text" : "password"}
                   placeholder="Password"
                   className=" rounded-xl py-2 px-5 w-full bg-white text-black"
                 />
-                <div className="absolute right-3 top-[27%] cursor-pointer text-slate-500">
-                  <Eye className="h-5" />
+                <div
+                  className="absolute right-3 top-[27%] cursor-pointer text-slate-500"
+                  onClick={() => handleShowPassword("password")}
+                >
+                  {showPassword.password ? (
+                    <Eye className="h-5" />
+                  ) : (
+                    <EyeOff className="h-5" />
+                  )}
                 </div>
               </div>
             </div>
@@ -83,6 +94,9 @@ const LoginForm = () => {
 
       {/* Right side */}
       <div className="colorWave flex flex-col text-white bg-cover bg-center justify-center items-center gap-5 w-full md:w-[35%] sm:w-full h-screen  animate-gradient">
+        <div className="flex flex-col justify-center gap-1 py-5 px-2">
+          <Image src="/logo.png" alt="AC Logo" width={60} height={60} />
+        </div>
         <h1 className="text-4xl font-bold py-3">New Here?</h1>
         <h3 className="leading-[2rem] px-2 text-center text-xl">
           Sign up and discover a great amount of new opportunities!

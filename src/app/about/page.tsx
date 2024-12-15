@@ -44,7 +44,7 @@ export default function About() {
         <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-400 to-cyan-500 mb-4 bg-clip-text text-transparent mb-6">What We Do</h2>
         <p className="text-lg text-gray-700 mb-8">
           We specialize in building modern, scalable, and responsive websites
-          and applications. Whether it's an e-commerce store, corporate
+          and applications. Whether it&apos;s an e-commerce store, corporate
           website, or a custom-built web app, we bring your vision to life with
           attention to detail and the latest technologies.
         </p>
