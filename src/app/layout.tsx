@@ -5,6 +5,7 @@ import RootLayoutContext from "@/components/RootLayout/RootLayoutContext";
 import { Toaster } from "@/components/ui/toaster";
 import SessionLayout from "@/components/RootLayout/SessionLayout";
 import { ThemeProvider } from "@/components/theme-provider";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -36,6 +37,7 @@ export default function RootLayout({
             <RootLayoutContext>
               {children}
               <Toaster />
+              <SpeedInsights />
             </RootLayoutContext>
           </ThemeProvider>
         </SessionLayout>

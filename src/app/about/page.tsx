@@ -34,14 +34,14 @@ export default function About() {
       </div>
 
       <section className="container mx-auto max-w-4xl px-6 py-12">
-        <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-400 to-cyan-500 mb-4 bg-clip-text text-transparent mb-6">Our Mission</h2>
+        <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-400 to-cyan-500 mb-4 bg-clip-text text-transparent ">Our Mission</h2>
         <p className="text-lg text-gray-700 mb-8">
           Our mission is to help businesses and individuals succeed online by
           providing cutting-edge web development solutions, optimized for
           performance, security, and user experience.
         </p>
 
-        <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-400 to-cyan-500 mb-4 bg-clip-text text-transparent mb-6">What We Do</h2>
+        <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-400 to-cyan-500 mb-4 bg-clip-text text-transparent ">What We Do</h2>
         <p className="text-lg text-gray-700 mb-8">
           We specialize in building modern, scalable, and responsive websites
           and applications. Whether it&apos;s an e-commerce store, corporate
@@ -49,7 +49,7 @@ export default function About() {
           attention to detail and the latest technologies.
         </p>
 
-        <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-400 to-cyan-500 mb-4 bg-clip-text text-transparent mb-6">Lorem Ipsum</h2>
+        <h2 className="text-3xl font-bold bg-gradient-to-tl from-blue-400 to-cyan-500 mb-4 bg-clip-text text-transparent ">Lorem Ipsum</h2>
         <p className="text-lg text-gray-700 mb-8">
           Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec
           odio. Praesent libero. Sed cursus ante dapibus diam. Sed nisi. Nulla
