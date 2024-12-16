@@ -108,6 +108,7 @@ const RegisterForm = () => {
                 onChange={handleChange}
                 id="username"
                 type="text"
+                required
                 placeholder="Name"
                 className="z-50 rounded-xl py-2 px-5 w-full text-black bg-white"
               />
@@ -115,6 +116,7 @@ const RegisterForm = () => {
                 value={inputData.email}
                 onChange={handleChange}
                 id="email"
+                required
                 type="email"
                 placeholder="Email"
                 className="z-50 rounded-xl py-2 px-5 w-full text-black bg-white"
@@ -125,6 +127,7 @@ const RegisterForm = () => {
                   value={inputData.password}
                   onChange={handleChange}
                   id="password"
+                  required
                   type={showPassword.password ? "text" : "password"}
                   placeholder="Password"
                   className="z-50 rounded-xl py-2 px-5 w-full text-black bg-white"
@@ -156,6 +159,7 @@ const RegisterForm = () => {
                   onChange={handleChange}
                   type={showPassword.confirmPassword ? "text" : "password"}
                   placeholder="Confirm Password"
+                  required
                   className={`z-50 flex items-center rounded-xl py-2 px-5 w-full bg-white ${
                     !isPasswordMatch ? "text-black" : "text-red-500"
                   }`}
