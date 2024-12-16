@@ -8,7 +8,7 @@ interface EmailProps {
   html: string;
 }
 
-export async function SendEmail({ to, from, subject, text, html }: EmailProps) {
+export async function SendEmail({ to, subject, text, html }: EmailProps) {
   try {
     const service = process.env.SMTP_SERVICE || "zoho";
     let host, port, secure;
@@ -32,10 +32,11 @@ export async function SendEmail({ to, from, subject, text, html }: EmailProps) {
     // Verify transporter connection
     await transporter.verify();
     console.log("Server is ready to take our messages");
+    const smtpEmail = `AC CORP ${process.env.SMTP_EMAIL || "AC@corp.com"}`;
 
     // Create the email message
     const message = {
-      from: from || process.env.SMTP_EMAIL,
+      from: smtpEmail,
       to,
       subject,
       text,
