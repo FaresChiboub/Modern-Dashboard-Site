@@ -42,15 +42,22 @@ export async function POST(req: NextRequest) {
         role: updatedUser.role,
         username: updatedUser.username,
         image: updatedUser.image,
-        isVerified: updatedUser.isVerified, 
+        isVerified: updatedUser.isVerified,
       },
     };
     // Sign a new token with the updated payload
     const newToken = jwt.sign(payload, secretKey, { expiresIn: "1d" });
-
+    const isProduction = process.env.NODE_ENV === "production";
     // Set the new token in the cookies
+    
     const cookieStore = await cookies();
-    cookieStore.set("token", newToken, { path: "/", httpOnly: true });
+    
+    cookieStore.set("token", newToken, {
+      path: "/",
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+    });
 
     return new NextResponse(
       JSON.stringify({
