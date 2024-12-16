@@ -107,14 +107,15 @@ export async function POST(req: NextRequest) {
       }
     );
   } catch (error) {
-    console.error(error);
+    const err = error as Error;
+    console.error("Registration Error:", err.stack || error);
     return new NextResponse(
-      JSON.stringify({ error: { message: "Internal error" } }),
+      JSON.stringify({
+        error: { message: "Internal error: " + err.message },
+      }),
       {
-        status: 500, // Internal server error
-        headers: {
-          "Content-Type": "application/json",
-        },
+        status: 500,
+        headers: { "Content-Type": "application/json" },
       }
     );
   }
