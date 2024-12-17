@@ -47,7 +47,7 @@ export async function GET() {
       // Access user data correctly and provide defaults where necessary
       const username = userPayload?.user?.username || "Guest";
       const image = userPayload?.user?.image || "/user.png";
-      const email = userPayload?.user?.email || "/email@example.com";
+      const email = userPayload?.user?.email || "user@email.com";
 
       return new NextResponse(
         JSON.stringify({
