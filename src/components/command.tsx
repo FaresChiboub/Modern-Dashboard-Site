@@ -26,7 +26,7 @@ export function CommandDemo() {
   return (
     <Command
       className={`w-[215px] ${
-        theme === "dark" ? "bg-transparent text-white" : "bg-transparent text-black"
+        theme === "dark" ? "bg-transparent" : "bg-transparent"
       }`}
     >
       <CommandInput placeholder="Search or enter command..." />
