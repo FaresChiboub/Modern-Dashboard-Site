@@ -23,7 +23,7 @@ const ProfilePage: React.FC = () => {
     : "";
   return (
     <div>
-      <div className="flex flex-wrap bg-white gap-4 text-black mx-auto justify-center items-center w-full">
+      <div className="flex flex-wrap bg-white gap-4 text-black mx-auto justify-center items-center w-full mt-8">
         {/* Form Section */}
         <div className="w-full md:w-[48%] p-4">
           <div className="max-w-lg mx-auto">
