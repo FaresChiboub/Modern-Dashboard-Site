@@ -103,8 +103,8 @@ export default function Page() {
             <div
               className={`${
                 theme === "dark"
-                  ? "bg-slate-950 text-white"
-                  : "bg-transparent text-black"
+                 ? "bg-slate-950"
+                  : "bg-transparent"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
               <div className="flex justify-between items-center">
@@ -129,8 +129,8 @@ export default function Page() {
             <div
               className={`${
                 theme === "dark"
-                  ? "bg-slate-950 text-white"
-                  : "bg-transparent text-black"
+                  ? "bg-slate-950"
+                  : "bg-transparent"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
               <div className="flex justify-between items-center">
@@ -159,8 +159,8 @@ export default function Page() {
             <div
               className={`${
                 theme === "dark"
-                  ? "bg-slate-950 text-white"
-                  : "bg-transparent text-black"
+                  ? "bg-slate-950"
+                  : "bg-transparent"
               } aspect-auto flex flex-col justify-between p-6 rounded-xl shadow-md`}
             >
               <div className={`flex justify-between items-center`}>
