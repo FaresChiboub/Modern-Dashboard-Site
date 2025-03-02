@@ -12,7 +12,7 @@ interface UserPayload {
 
 export async function GET() {
   const secretKey = process.env.JWT_SECRET;
-  // Check if the JWT_SECRET is missing in environment variables
+
   if (!secretKey) {
     return new NextResponse(
       JSON.stringify({
@@ -30,21 +30,16 @@ export async function GET() {
     if (!token) {
       return new NextResponse(
         JSON.stringify({ error: { message: "No token found" } }),
-        {
-          status: 409,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 409, headers: { "Content-Type": "application/json" } }
       );
     }
-    const secret = new TextEncoder().encode(secretKey);
-    // Verify the token and extract the payload
-    const verifiedToken = await jose.jwtVerify(token, secret);
 
+    const secret = new TextEncoder().encode(secretKey);
+    const verifiedToken = await jose.jwtVerify(token, secret);
     const payload = verifiedToken.payload as unknown;
+
     if ((payload as UserPayload).user) {
       const userPayload = payload as UserPayload;
-
-      // Access user data correctly and provide defaults where necessary
       const username = userPayload?.user?.username || "Guest";
       const image = userPayload?.user?.image || "/user.png";
       const email = userPayload?.user?.email || "user@email.com";
