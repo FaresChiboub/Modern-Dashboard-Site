@@ -14,12 +14,12 @@ import * as zxcvbnCommonPackage from "@zxcvbn-ts/language-common";
 import * as zxcvbnEnPackage from "@zxcvbn-ts/language-en";
 import { matcherPwnedFactory } from "@zxcvbn-ts/matcher-pwned";
 import validator from "validator";
+
 const matcherPwned = matcherPwnedFactory(fetch, zxcvbnOptions);
 zxcvbnOptions.addMatcher("pwned", matcherPwned);
 const options = {
   dictionary: {
     ...zxcvbnCommonPackage.dictionary,
-    ...zxcvbnEnPackage.dictionary,
     ...zxcvbnEnPackage.dictionary,
   },
   graphs: zxcvbnCommonPackage.adjacencyGraphs,
@@ -31,86 +31,72 @@ zxcvbnOptions.setOptions(options);
 export async function POST(req: NextRequest) {
   const secretKey = process.env.JWT_SECRET || "";
   const refreshKey = process.env.JWT_REFRESH_SECRET || "";
-  if (!secretKey || !refreshKey) {
-    throw new Error(
-      "JWT_SECRET or JWT_REFRESH_SECRET is not defined in environment variables."
+  const smtpEmail = process.env.SMTP_EMAIL;
+
+  if (!secretKey || !refreshKey || !smtpEmail) {
+    return new NextResponse(
+      JSON.stringify({ error: { message: "Required environment variables are missing!" } }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 
   try {
     const { username, email, password, role } = await req.json();
+
+    // Validate Email Format
     if (!validator.isEmail(email)) {
       return new NextResponse(
         JSON.stringify({ error: { message: "Invalid email format!" } }),
         { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
-    const usernamePart = email.split("@")[0];
-    const usernameRegex = /^[A-Za-z0-9._%+-]+$/;
-    if (!usernameRegex.test(usernamePart)) {
-      return new NextResponse(
-        JSON.stringify({
-          error: { message: "Email username cannot be only numbers!" },
-        }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
-      );
-    }
+
+    // Trim and sanitize input
     const sanitizedEmail = email.trim().toLowerCase();
+    const sanitizedUsername = username.trim().toLowerCase();
+
     // Validate fields
-    if (!username || !email || !password) {
+    if (!sanitizedUsername || !sanitizedEmail || !password) {
       return new NextResponse(
         JSON.stringify({ error: { message: "All fields are required!" } }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
     // Password strength check
     const passwordStrength = await zxcvbnAsync(password);
     const passwordScore = passwordStrength.score;
-
     let passwordMessage = "";
 
     if (passwordScore === 0) {
       passwordMessage = "Password is too guessable: risky password.";
     } else if (passwordScore === 1) {
-      passwordMessage =
-        "Password is very guessable: protection from throttled online attacks.";
+      passwordMessage = "Password is very guessable: protection from throttled online attacks.";
     } else if (passwordScore === 2) {
-      passwordMessage =
-        "Password is somewhat guessable: protection from unthrottled online attacks.";
+      passwordMessage = "Password is somewhat guessable: protection from unthrottled online attacks.";
     } else if (passwordScore === 3) {
-      passwordMessage =
-        "Password is safely unguessable: moderate protection from offline slow-hash scenarios.";
+      passwordMessage = "Password is safely unguessable: moderate protection from offline slow-hash scenarios.";
     } else if (passwordScore === 4) {
-      passwordMessage =
-        "Password is very strong: great protection from offline slow-hash scenarios.";
+      passwordMessage = "Password is very strong: great protection from offline slow-hash scenarios.";
     }
 
     // For weak passwords (score 0, 1, or 2), show message and don't proceed with registration
     if (passwordScore < 3) {
       return new NextResponse(
         JSON.stringify({ error: { message: passwordMessage } }),
-        {
-          status: 400,
-          headers: { "Content-Type": "application/json" },
-        }
+        { status: 400, headers: { "Content-Type": "application/json" } }
       );
     }
 
-    // Check if user already exists (email and username)
+    // Check if user already exists (case-insensitive check for email and username)
     const [existingUserByEmail, existingUserByUsername] = await Promise.all([
       prisma.user.findUnique({ where: { email: sanitizedEmail } }),
-      prisma.user.findUnique({ where: { username } }),
+      prisma.user.findUnique({ where: { username: sanitizedUsername } }),
     ]);
 
     if (existingUserByEmail) {
       return new NextResponse(
-        JSON.stringify({
-          error: { message: "User already exists with this email!" },
-        }),
+        JSON.stringify({ error: { message: "User already exists with this email!" } }),
         { status: 409, headers: { "Content-Type": "application/json" } }
       );
     }
@@ -128,7 +114,7 @@ export async function POST(req: NextRequest) {
     const verificationCode = randomInt(100000, 1000000);
     const newUser = await prisma.user.create({
       data: {
-        username,
+        username: sanitizedUsername,
         password: hash,
         email: sanitizedEmail,
         role,
@@ -137,73 +123,42 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create JWT tokens
-    const accessToken = jwt.sign(
-      {
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          username: newUser.username,
-          isVerified: newUser.isVerified,
-        },
+    // Create JWT tokens (refactor to avoid duplication)
+    const tokenPayload = {
+      user: {
+        id: newUser.id,
+        email: newUser.email,
+        username: newUser.username,
+        isVerified: newUser.isVerified,
       },
-      secretKey,
-      { expiresIn: "1h" }
-    );
+    };
 
-    const refreshToken = jwt.sign(
-      {
-        user: {
-          id: newUser.id,
-          email: newUser.email,
-          username: newUser.username,
-          isVerified: newUser.isVerified,
-        },
-      },
-      refreshKey,
-      { expiresIn: "7d" }
-    );
+    const accessToken = jwt.sign(tokenPayload, secretKey, { expiresIn: "1h" });
+    const refreshToken = jwt.sign(tokenPayload, refreshKey, { expiresIn: "7d" });
 
     // Set cookies
     const cookieStore = await cookies();
     cookieStore.set("token", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      sameSite: "strict",
       path: "/",
       maxAge: 1 * 60 * 60,
     });
     cookieStore.set("refreshToken", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: process.env.NODE_ENV === "production" ? "none" : "strict",
+      sameSite: "strict",
       path: "/",
       maxAge: 7 * 24 * 60 * 60,
     });
 
     // Send email with verification code
-    const smtpEmail = process.env.SMTP_EMAIL;
-    if (!smtpEmail) {
-      return new NextResponse(
-        JSON.stringify({
-          error: { message: "SMTP email is missing in environment variables." },
-        }),
-        { status: 500, headers: { "Content-Type": "application/json" } }
-      );
-    }
-
-    // Send the email with verification code
-    const filePath = path.join(
-      process.cwd(),
-      "public",
-      "component",
-      "email",
-      "index.html"
-    );
+    const filePath = path.join(process.cwd(), "public", "component", "email", "index.html");
     const htmlTemplate = fs.readFileSync(filePath, "utf-8");
     const template = Handlebars.compile(htmlTemplate);
     const htmlContent = template({
-      username,
+      username: sanitizedUsername,
       verificationCode: verificationCode.toString(),
     });
 
@@ -218,24 +173,16 @@ export async function POST(req: NextRequest) {
     return new NextResponse(
       JSON.stringify({
         message: `Account successfully created! Please verify your email. Password strength: ${passwordMessage}`,
-        user: { username, email },
+        user: { username: sanitizedUsername, email: sanitizedEmail },
       }),
-      {
-        status: 201,
-        headers: { "Content-Type": "application/json" },
-      }
+      { status: 201, headers: { "Content-Type": "application/json" } }
     );
   } catch (error) {
     const err = error as Error;
     console.error("Registration Error:", err.stack || error);
     return new NextResponse(
-      JSON.stringify({
-        error: { message: "Internal error: " + err.message },
-      }),
-      {
-        status: 500,
-        headers: { "Content-Type": "application/json" },
-      }
+      JSON.stringify({ error: { message: "Internal error: " + err.message } }),
+      { status: 500, headers: { "Content-Type": "application/json" } }
     );
   }
 }
