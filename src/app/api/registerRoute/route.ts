@@ -90,8 +90,8 @@ export async function POST(req: NextRequest) {
 
     // Check if user already exists (case-insensitive check for email and username)
     const [existingUserByEmail, existingUserByUsername] = await Promise.all([
-      prisma.user.findUnique({ where: { email: sanitizedEmail } }),
-      prisma.user.findUnique({ where: { username: sanitizedUsername } }),
+      prisma.user.findUnique({ where: { email: sanitizedEmail.toLowerCase() } }),
+      prisma.user.findUnique({ where: { username: sanitizedUsername.toLowerCase() } }),
     ]);
 
     if (existingUserByEmail) {
